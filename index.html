@@ -48,7 +48,7 @@
   <!-- JEWELRY SCROLL LIST -->
   <div id="jewelry-options" class="options-group" style="display:none;"></div>
 
-  <!-- SNAPSHOT MODAL (single photo view) -->
+  <!-- SNAPSHOT MODAL (single photo) -->
   <div id="snapshot-modal">
     <div class="modal-content">
       <span id="close-snapshot" class="close-btn">&times;</span>
@@ -66,8 +66,23 @@
     <div class="gallery-content">
       <span id="close-gallery" class="close-btn">&times;</span>
       <h3>Your Looks Gallery</h3>
+
+      <!-- Big selected image -->
       <img id="gallery-main-preview" />
+
+      <!-- Thumbnails -->
       <div id="gallery-thumbs"></div>
+
+      <!-- NEW: Story Reel section -->
+      <div class="reel-controls">
+        <button id="create-reel-btn" class="primary-btn">Create Story Reel 🎬</button>
+      </div>
+
+      <div id="reel-section" style="display:none;">
+        <p class="reel-title">Reel Preview</p>
+        <video id="reel-video" controls playsinline></video>
+        <button id="download-reel-btn" class="primary-btn">Download Reel</button>
+      </div>
     </div>
   </div>
 

@@ -30,19 +30,23 @@ const autoTryBtn = document.getElementById('auto-try-btn');
 let autoTryRunning = false;
 let autoTryTimeout = null;
 let autoTryIndex = 0;
-let autoSnapshots = [];
+let autoSnapshots = [];      // all screenshots from Try All
 
 const galleryModal = document.getElementById('gallery-modal');
 const closeGalleryBtn = document.getElementById('close-gallery');
 const galleryMainPreview = document.getElementById('gallery-main-preview');
 const galleryThumbs = document.getElementById('gallery-thumbs');
 
-// NEW: Gentle zoom based on face size
-let currentZoom = 1;
+// STORY REEL elements
+const createReelBtn = document.getElementById('create-reel-btn');
+const reelSection = document.getElementById('reel-section');
+const reelVideo = document.getElementById('reel-video');
+const downloadReelBtn = document.getElementById('download-reel-btn');
+let reelBlobUrl = null;
 
-// ==========================================
-// 1. LOCAL FILES CONFIG
-// ==========================================
+/* ===========================================
+   1. LOCAL FILES CONFIG
+=========================================== */
 
 const LOCAL_IMAGES = {
   diamond_earrings: ['001.png','002.png','003.png','004.png','005.png'],
@@ -55,10 +59,9 @@ function buildSrc(typeKey, filename) {
   return `${typeKey}/${filename}`;
 }
 
-// ==========================================
-// 2. LOAD JEWELRY FROM LOCAL FOLDERS
-// ==========================================
-
+/* ===========================================
+   2. LOAD JEWELRY FROM LOCAL FOLDERS
+=========================================== */
 function loadImage(src) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -79,10 +82,9 @@ async function changeJewelry(typeKey, src) {
   else necklaceImg = img;
 }
 
-// ==========================================
-// 3. CATEGORY HANDLING
-// ==========================================
-
+/* ===========================================
+   3. CATEGORY HANDLING
+=========================================== */
 function toggleCategory(category) {
   stopAutoTry();
   currentCategory = category;
@@ -92,7 +94,8 @@ function toggleCategory(category) {
 
 function selectJewelryType(category, metal) {
   stopAutoTry();
-  const typeKey = `${metal}_${category}`;  // eg: "gold_earrings"
+
+  const typeKey = `${metal}_${category}`;  // eg: gold_earrings
   currentTypeKey = typeKey;
 
   subcategoryButtons.style.display = "none";
@@ -104,6 +107,7 @@ function selectJewelryType(category, metal) {
 window.toggleCategory = toggleCategory;
 window.selectJewelryType = selectJewelryType;
 
+// Build thumbnail list
 function insertJewelryOptions(typeKey) {
   jewelryOptions.innerHTML = "";
   const files = LOCAL_IMAGES[typeKey] || [];
@@ -122,10 +126,9 @@ function insertJewelryOptions(typeKey) {
   });
 }
 
-// ==========================================
-// 4. MEDIAPIPE FACE MESH
-// ==========================================
-
+/* ===========================================
+   4. MEDIAPIPE FACE MESH
+=========================================== */
 const faceMesh = new FaceMesh({
   locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`
 });
@@ -151,17 +154,12 @@ faceMesh.onResults(results => {
         z: p.z * 0.8 + newLandmarks[i].z * 0.2
       }));
     }
-
-    // NEW: update gentle zoom based on face size
-    updateZoom(smoothedFaceLandmarks);
-
     drawJewelry(smoothedFaceLandmarks);
   }
 });
 
-// Start Camera
+/* Start Camera */
 document.addEventListener("DOMContentLoaded", () => startCamera());
-
 function startCamera(facingMode="user") {
   if (camera) camera.stop();
   camera = new Camera(videoElement, {
@@ -178,45 +176,9 @@ videoElement.onloadedmetadata = () => {
   canvasElement.height = videoElement.videoHeight;
 };
 
-// ==========================================
-// 5. GENTLE AUTO ZOOM
-// ==========================================
-
-function updateZoom(face) {
-  if (!face || !canvasElement.width) return;
-
-  const vw = canvasElement.width;
-  const vh = canvasElement.height;
-
-  const L = face[33];
-  const R = face[263];
-
-  const dx = (R.x - L.x) * vw;
-  const dy = (R.y - L.y) * vh;
-  const eyeDist = Math.hypot(dx, dy);
-
-  // We want eyes to occupy around ~28% of width
-  const targetFraction = 0.28;
-  const targetEyeDist = vw * targetFraction;
-
-  let z = targetEyeDist / eyeDist;
-
-  // Clamp for gentle zoom only
-  if (z < 1.0) z = 1.0;
-  if (z > 1.25) z = 1.25;
-
-  // Smooth the zoom change
-  currentZoom = currentZoom * 0.85 + z * 0.15;
-
-  const transformStr = `scale(${currentZoom})`;
-  videoElement.style.transform = transformStr;
-  canvasElement.style.transform = transformStr;
-}
-
-// ==========================================
-// 6. DRAW JEWELRY
-// ==========================================
-
+/* ===========================================
+   5. DRAW JEWELRY
+=========================================== */
 function drawJewelry(face) {
   if (!face) return;
 
@@ -227,7 +189,7 @@ function drawJewelry(face) {
   const R = face[263];
   const eyeDist = Math.hypot((R.x-L.x)*vw, (R.y-L.y)*vh);
 
-  // Earrings
+  /* Earrings */
   const le = face[132];
   const re = face[361];
 
@@ -245,7 +207,7 @@ function drawJewelry(face) {
     canvasCtx.drawImage(earringImg, smoothedFacePoints.right.x-w/2, smoothedFacePoints.right.y, w, h);
   }
 
-  // Necklace
+  /* Necklace */
   const neck = face[152];
   const neckPos = { x: neck.x*vw, y: neck.y*vh };
   smoothedFacePoints.neck = smoothPoint(smoothedFacePoints.neck, neckPos);
@@ -267,10 +229,9 @@ function smoothPoint(prev, curr, factor=0.4) {
   };
 }
 
-// ==========================================
-// 7. CAPTURE CURRENT FRAME (NO POPUP)
-// ==========================================
-
+/* ===========================================
+   6. HELPER: CAPTURE CURRENT FRAME (NO POPUP)
+=========================================== */
 function captureCurrentFrameDataURL() {
   const snapCanvas = document.createElement("canvas");
   snapCanvas.width = canvasElement.width;
@@ -283,10 +244,9 @@ function captureCurrentFrameDataURL() {
   return snapCanvas.toDataURL("image/png");
 }
 
-// ==========================================
-// 8. MANUAL SNAPSHOT (CAMERA BUTTON)
-// ==========================================
-
+/* ===========================================
+   7. MANUAL SNAPSHOT (CAMERA BUTTON)
+=========================================== */
 function takeSnapshot() {
   lastSnapshotDataURL = captureCurrentFrameDataURL();
   snapshotPreview.src = lastSnapshotDataURL;
@@ -320,9 +280,9 @@ closeSnapshotBtn.onclick = closeSnapshot;
 downloadBtn.onclick = downloadSnapshot;
 shareBtn.onclick = shareSnapshot;
 
-// ==========================================
-// 9. TRY ALL + AUTO SCREENSHOT + GALLERY
-// ==========================================
+/* ===========================================
+   8. TRY ALL + AUTO SCREENSHOT + GALLERY
+=========================================== */
 
 function stopAutoTry() {
   autoTryRunning = false;
@@ -352,20 +312,24 @@ async function runAutoTryAll() {
   autoTryBtn.classList.add('active');
   autoTryBtn.textContent = 'STOP';
 
+  // Async loop with timeouts
   const loopStep = async () => {
     if (!autoTryRunning) return;
 
     const filename = files[autoTryIndex];
     const src = buildSrc(currentTypeKey, filename);
 
+    // 1) Change jewelry
     await changeJewelry(currentTypeKey, src);
 
-    // wait so jewelry + face stabilize
+    // 2) Wait a bit for face + overlay to stabilise
     await new Promise(res => setTimeout(res, 1200));
 
+    // 3) Capture screenshot
     const dataURL = captureCurrentFrameDataURL();
     autoSnapshots.push(dataURL);
 
+    // 4) Next index
     autoTryIndex++;
     if (autoTryIndex >= files.length) {
       stopAutoTry();
@@ -386,7 +350,7 @@ function toggleAutoTry() {
 
 autoTryBtn.onclick = toggleAutoTry;
 
-// GALLERY
+/* GALLERY LOGIC */
 
 function openGallery() {
   if (!autoSnapshots.length) {
@@ -395,6 +359,7 @@ function openGallery() {
   }
 
   galleryThumbs.innerHTML = '';
+  reelSection.style.display = 'none';  // hide old reel
 
   autoSnapshots.forEach((src, idx) => {
     const img = document.createElement('img');
@@ -420,5 +385,105 @@ function setGalleryMain(index) {
 function closeGallery() {
   galleryModal.style.display = 'none';
 }
-
 closeGalleryBtn.onclick = closeGallery;
+
+/* ===========================================
+   9. STORY REEL CREATION (AUTO VIDEO)
+=========================================== */
+
+async function createReelFromSnapshots() {
+  if (!autoSnapshots.length) {
+    alert("No screenshots to create a reel.");
+    return;
+  }
+
+  if (typeof MediaRecorder === 'undefined') {
+    alert("Reel creation is not supported in this browser.");
+    return;
+  }
+
+  const fps = 4;                       // frames per second
+  const frameDuration = 1000 / fps;    // ms per frame
+  const width = canvasElement.width || 720;
+  const height = canvasElement.height || 1280;
+
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = width;
+  offCanvas.height = height;
+  const offCtx = offCanvas.getContext('2d');
+
+  const stream = offCanvas.captureStream(fps);
+  const chunks = [];
+  const options = { mimeType: 'video/webm;codecs=vp9' };
+
+  let recorder;
+  try {
+    recorder = new MediaRecorder(stream, options);
+  } catch (err) {
+    // fallback
+    recorder = new MediaRecorder(stream);
+  }
+
+  return new Promise((resolve) => {
+    recorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      if (reelBlobUrl) URL.revokeObjectURL(reelBlobUrl);
+      reelBlobUrl = URL.createObjectURL(blob);
+      reelVideo.src = reelBlobUrl;
+      reelSection.style.display = 'block';
+      resolve();
+    };
+
+    recorder.start();
+
+    let i = 0;
+    function drawNext() {
+      if (i >= autoSnapshots.length) {
+        recorder.stop();
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        // fill background
+        offCtx.fillStyle = "#000";
+        offCtx.fillRect(0,0,width,height);
+
+        // contain fit
+        const r = Math.min(width/img.width, height/img.height);
+        const dw = img.width * r;
+        const dh = img.height * r;
+        const dx = (width - dw) / 2;
+        const dy = (height - dh) / 2;
+
+        offCtx.drawImage(img, dx, dy, dw, dh);
+        i++;
+        setTimeout(drawNext, frameDuration);
+      };
+      img.src = autoSnapshots[i];
+    }
+
+    drawNext();
+  });
+}
+
+createReelBtn.addEventListener('click', () => {
+  createReelFromSnapshots().catch(console.error);
+});
+
+downloadReelBtn.addEventListener('click', () => {
+  if (!reelBlobUrl) {
+    alert("Please generate the reel first.");
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = reelBlobUrl;
+  a.download = 'jewelry-story.webm';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
