@@ -1,0 +1,223 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body, html {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+}
+
+/* CAMERA + CANVAS */
+video, canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: 1;
+
+  /* NEW: gentle zoom behaviour */
+  transform-origin: center center;
+  transition: transform 0.25s ease-out;
+}
+
+/* LOGO */
+#branding {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+#branding img {
+  width: 80px;
+}
+
+/* CAMERA + LOCATION BUTTONS */
+.ui-buttons {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+.ui-buttons button,
+.ui-buttons a {
+  width: 50px;
+  height: 50px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+.ui-buttons img {
+  width: 25px;
+}
+
+/* CATEGORY + TRY ALL BUTTONS */
+#jewelry-mode {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+#jewelry-mode button {
+  padding: 10px 16px;
+  background: #5E0F8B;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+}
+
+/* Highlight when TRY ALL active */
+#auto-try-btn.active {
+  background: #FFB800;
+  color: #000;
+}
+
+/* SUB CATEGORY */
+#subcategory-buttons {
+  position: fixed;
+  bottom: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  z-index: 10;
+}
+#subcategory-buttons button {
+  padding: 8px 12px;
+  background: #FFB800;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-weight: bold;
+}
+
+/* JEWELRY SCROLL LIST */
+.options-group {
+  position: fixed;
+  bottom: 50px;
+  width: 100%;
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 10px;
+  background: #5E0F8B;
+  border-radius: 12px;
+  z-index: 10;
+}
+.options-group button {
+  border: none;
+  background: none;
+}
+.options-group img {
+  width: 70px;
+  height: 70px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+}
+.options-group img:hover {
+  border-color: white;
+}
+
+/* SNAPSHOT MODAL */
+#snapshot-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.modal-content {
+  background: #111;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+}
+.close-btn {
+  position: absolute;
+  top: 6px;
+  right: 14px;
+  cursor: pointer;
+  font-size: 26px;
+}
+#snapshot-preview {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+.action-buttons button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #FFB800;
+  border: none;
+  font-weight: bold;
+  color: #000;
+}
+
+/* GALLERY MODAL */
+#gallery-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+}
+.gallery-content {
+  background: #111;
+  padding: 16px;
+  border-radius: 12px;
+  width: 95%;
+  max-width: 480px;
+  text-align: center;
+  position: relative;
+}
+#gallery-main-preview {
+  width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+#gallery-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 30vh;
+  overflow-y: auto;
+  justify-content: center;
+}
+#gallery-thumbs img {
+  width: 70px;
+  height: 70px;
+  border-radius: 6px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+#gallery-thumbs img.active {
+  border-color: #FFB800;
+}

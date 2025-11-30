@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jewels Try-On</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Poppins&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- CAMERA + CANVAS -->
+  <video id="webcam" autoplay muted playsinline></video>
+  <canvas id="overlay"></canvas>
+
+  <!-- LOGO -->
+  <div id="branding">
+    <img src="logo.png" class="logo-icon" />
+  </div>
+
+  <!-- CAMERA + LOCATION BUTTONS -->
+  <div class="ui-buttons">
+    <button id="capture-btn" title="Take Photo">
+      <img src="camera-icon.png" />
+    </button>
+
+    <a href="https://maps.app.goo.gl/gsTuBCVMUVk9cxYZ6" target="_blank" title="Location">
+      <img src="location_icon.png" />
+    </a>
+  </div>
+
+  <!-- CATEGORY + TRY ALL -->
+  <div id="jewelry-mode">
+    <button onclick="toggleCategory('earrings')">EARRINGS</button>
+    <button onclick="toggleCategory('necklaces')">CHAINS</button>
+    <button id="auto-try-btn">TRY ALL</button>
+  </div>
+
+  <!-- SUB CATEGORY -->
+  <div id="subcategory-buttons" style="display: none;">
+    <button onclick="selectJewelryType('earrings','gold')">Gold Earrings</button>
+    <button onclick="selectJewelryType('earrings','diamond')">Diamond Earrings</button>
+    <button onclick="selectJewelryType('necklaces','gold')">Gold Chains</button>
+    <button onclick="selectJewelryType('necklaces','diamond')">Diamond Chains</button>
+  </div>
+
+  <!-- JEWELRY SCROLL LIST -->
+  <div id="jewelry-options" class="options-group" style="display:none;"></div>
+
+  <!-- SNAPSHOT MODAL (single photo view) -->
+  <div id="snapshot-modal">
+    <div class="modal-content">
+      <span id="close-snapshot" class="close-btn">&times;</span>
+      <h3>Your Look</h3>
+      <img id="snapshot-preview" />
+      <div class="action-buttons">
+        <button id="download-btn">Download</button>
+        <button id="share-btn">Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALLERY MODAL (after TRY ALL) -->
+  <div id="gallery-modal">
+    <div class="gallery-content">
+      <span id="close-gallery" class="close-btn">&times;</span>
+      <h3>Your Looks Gallery</h3>
+      <img id="gallery-main-preview" />
+      <div id="gallery-thumbs"></div>
+    </div>
+  </div>
+
+  <!-- Mediapipe -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+  <!-- Main Script -->
+  <script src="script.js"></script>
+
+</body>
+</html>
