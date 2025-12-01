@@ -91,13 +91,18 @@
       <img id="gallery-main" src="" alt="Selected look" />
       <div id="gallery-thumbs"></div>
       <div class="gallery-buttons">
-        <button onclick="downloadCurrentFromGallery()">Download</button>
-        <button class="whatsapp-btn" onclick="shareCurrentToWhatsApp()">WhatsApp</button>
+        <!-- CHANGED: Download All + Share (no WhatsApp) -->
+        <button onclick="downloadAllImages()">Download All</button>
+        <button onclick="shareCurrentFromGallery()">Share</button>
       </div>
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- JSZip + FileSaver for ZIP download -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <!-- Mediapipe + main script -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="script.js"></script>

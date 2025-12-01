@@ -210,7 +210,6 @@ function captureSnapshotDataURL() {
   const snapshotCanvas = document.createElement('canvas');
   const ctx = snapshotCanvas.getContext('2d');
 
-  // use canvas resolution for better quality
   snapshotCanvas.width  = canvasElement.width;
   snapshotCanvas.height = canvasElement.height;
 
@@ -221,7 +220,7 @@ function captureSnapshotDataURL() {
   return snapshotCanvas.toDataURL('image/png');
 }
 
-/* ------------ manual snapshot button ------------ */
+/* ------------ manual snapshot button (single) ------------ */
 function takeSnapshot() {
   if (!smoothedLandmarks) {
     alert("Face not detected. Please try again.");
@@ -243,22 +242,20 @@ function saveSnapshot() {
   document.body.removeChild(link);
 }
 
-function shareSnapshot() {
-  if (navigator.share) {
-    fetch(lastSnapshotDataURL)
-      .then(res => res.blob())
-      .then(blob => {
-        const file = new File([blob], 'jewelry-tryon.png', { type: 'image/png' });
-        navigator.share({
-          title: 'Jewelry Try-On',
-          text: 'Check out my look!',
-          files: [file]
-        });
-      })
-      .catch(console.error);
-  } else {
-    alert('Sharing not supported on this browser.');
+async function shareSnapshot() {
+  if (!navigator.share || !navigator.canShare) {
+    alert('Sharing not supported on this device.');
+    return;
   }
+  const resp = await fetch(lastSnapshotDataURL);
+  const blob = await resp.blob();
+  const file = new File([blob], 'jewelry-tryon.png', { type: 'image/png' });
+
+  await navigator.share({
+    title: 'Jewelry Try-On',
+    text: 'Check out my look!',
+    files: [file]
+  });
 }
 
 function closeSnapshotModal() {
@@ -375,43 +372,48 @@ if (galleryClose) {
   });
 }
 
-/* Download from gallery */
-function downloadCurrentFromGallery() {
-  if (!galleryMain.src) return;
-  const link = document.createElement('a');
-  link.href = galleryMain.src;
-  link.download = `jewelry-look-${Date.now()}.png`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-/* WhatsApp share from gallery */
-function shareCurrentToWhatsApp() {
-  if (!galleryMain.src) {
-    alert('No image selected.');
+/* ------------ Download All (ZIP) from gallery ------------ */
+async function downloadAllImages() {
+  if (!autoSnapshots.length) {
+    alert("No images to download.");
     return;
   }
 
-  const phone = prompt(
-    'Enter WhatsApp number with country code (example: 919876543210):'
-  );
-  if (!phone) return;
+  const zip = new JSZip();
+  const folder = zip.folder("Your_Looks");
 
-  const text =
-    'Hi! Here is your jewelry try-on look. Save this image from the link below:\n\n' +
-    galleryMain.src;
+  autoSnapshots.forEach((dataURL, index) => {
+    const base64Data = dataURL.split(",")[1]; // remove header
+    folder.file(`look_${index + 1}.png`, base64Data, { base64: true });
+  });
 
-  const waUrl =
-    'https://wa.me/' +
-    encodeURIComponent(phone) +
-    '?text=' +
-    encodeURIComponent(text);
-
-  window.open(waUrl, '_blank');
+  const content = await zip.generateAsync({ type: "blob" });
+  saveAs(content, "OverlayJewels_Looks.zip");
 }
 
-/* expose functions to global */
+/* ------------ Share current image from gallery ------------ */
+async function shareCurrentFromGallery() {
+  if (!galleryMain.src) {
+    alert("No image selected.");
+    return;
+  }
+  if (!navigator.share || !navigator.canShare) {
+    alert("Sharing not supported on this device.");
+    return;
+  }
+
+  const resp = await fetch(galleryMain.src);
+  const blob = await resp.blob();
+  const file = new File([blob], 'jewelry-look.png', { type: 'image/png' });
+
+  await navigator.share({
+    title: 'Jewelry Try-On',
+    text: 'Check out my jewellery look!',
+    files: [file]
+  });
+}
+
+/* expose functions globally */
 window.toggleCategory = toggleCategory;
 window.selectJewelryType = selectJewelryType;
 window.takeSnapshot = takeSnapshot;
@@ -420,5 +422,5 @@ window.shareSnapshot = shareSnapshot;
 window.closeSnapshotModal = closeSnapshotModal;
 window.toggleInfoModal = toggleInfoModal;
 window.toggleTryAll = toggleTryAll;
-window.downloadCurrentFromGallery = downloadCurrentFromGallery;
-window.shareCurrentToWhatsApp = shareCurrentToWhatsApp;
+window.downloadAllImages = downloadAllImages;
+window.shareCurrentFromGallery = shareCurrentFromGallery;
