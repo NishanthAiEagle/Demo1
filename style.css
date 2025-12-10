@@ -1,33 +1,35 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* style.css — Merged & cleaned version for Nishanth (warm-gold premium) */
+
+/* ---------- Fonts ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@300;500;700&display=swap');
+
+:root{
+  --bg: #000000;
+  --panel: #0b0b0b;
+  --card: #0f0f10;
+  --muted: #c2b9ae;
+  --accent: #d4af37;     /* warm gold */
+  --accent-2: #f4a600;
+  --accent-contrast: #0b0b0b;
+  --glass: rgba(255,255,255,0.03);
+  --glass-2: rgba(255,255,255,0.02);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-1: 0 8px 30px rgba(0,0,0,0.6);
+  --glass-border: rgba(255,255,255,0.04);
 }
 
-body {
-  margin: 0;
-  background: #000;
-  color: #fff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  overflow: hidden;
-}
+/* ---------- Reset & base ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html, body, #app { height: 100%; width: 100%; background: var(--bg); color: #fff; font-family: Montserrat, system-ui, -apple-system, "Segoe UI", sans-serif; overflow: hidden; }
 
-#app {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-}
+/* ---------- App container ---------- */
+#app { width: 100vw; height: 100vh; position: relative; }
 
-/* Logo */
-#logo {
-  position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 10;
-}
-#logo img {
-  height: 40px;
-}
+/* Logo (kept for compatibility) */
+#logo { position: fixed; top: 12px; left: 12px; z-index: 10; }
+#logo img { height: 40px; }
 
 /* Video & Canvas */
 #video-container {
@@ -35,95 +37,116 @@ body {
   inset: 0;
   overflow: hidden;
   background: #000;
+  z-index: 0;
 }
-#webcam,
+
+/* bottom 30% dark gradient behind jewellery & buttons */
+#video-container::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20vh; /* ~30% of screen height */
+  pointer-events: none;
+  z-index: 5; /* above video, below UI buttons (which are z 20+) */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.86), rgba(0,0,0,0.0));
+}
+
+#webcam { display: none; }
 #overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  min-width: 100%;
-  min-height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* COVER so no black bar on top/bottom */
   object-fit: cover;
+  background: #000;
+  z-index: 1;
 }
 
-/* Jewelry category bar */
+/* ---------- Jewelry category bar (Gold / Diamond / Try All) ---------- */
 #jewelry-mode {
   position: fixed;
-  bottom: 100px;
+  bottom: 150px;             /* above subcategory row */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 16px;
+  gap: 12px;
   z-index: 20;
+  pointer-events: auto;
 }
-
 #jewelry-mode button {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border-radius: 999px;
   border: none;
-  background: #f4a600;
-  color: #000;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: var(--accent-contrast);
   font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-}
-
-#tryall-btn.active {
-  background: #6a0dad;
-  color: #fff;
-}
-
-/* Subcategory buttons */
-#subcategory-buttons {
-  position: fixed;
-  bottom: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  z-index: 20;
-}
-
-#subcategory-buttons button {
-  padding: 8px 14px;
-  border-radius: 999px;
-  border: none;
-  background: #5E0F8B;
-  color: #fff;
   font-size: 14px;
   cursor: pointer;
+  box-shadow: 0 5px 14px rgba(212,175,55,0.12);
+  transition: transform .12s ease;
+}
+#jewelry-mode button:hover { transform: translateY(-3px); }
+#tryall-btn { background: rgba(255,255,255,0.06); color: #fff; }
+#tryall-btn.active { background: var(--accent); color: var(--accent-contrast); }
+
+/* ---------- Subcategory buttons (Gold Earrings / Necklaces etc.) ---------- */
+#subcategory-buttons {
+  position: fixed;
+  bottom: 90px;              /* just above jewellery thumbnails */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 25;
+}
+#subcategory-buttons button {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(180deg, #f4c542, #e1a722);
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.45);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+#subcategory-buttons button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+}
+#subcategory-buttons button.active {
+  background: linear-gradient(180deg, #ffdb70, #f4b400);
+  color: #000;
 }
 
-/* Jewelry thumbnails */
+/* ---------- Jewelry thumbnails row ---------- */
 #jewelry-options {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(92, 23, 140, 0.98);
+  background: transparent; /* gradient already handled by video-container::after */
   display: flex;
   overflow-x: auto;
-  padding: 8px 12px;
+  padding: 10px 12px;
   gap: 10px;
   z-index: 20;
+  border-top: 1px solid rgba(255,255,255,0.03);
 }
-
-#jewelry-options button {
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-}
-
+#jewelry-options button { background: transparent; border: none; padding: 0; cursor: pointer; }
 #jewelry-options img {
   height: 60px;
   width: auto;
   object-fit: contain;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.7));
 }
 
-/* Snapshot button */
+/* ---------- Snapshot button ---------- */
 #snapshot-btn {
   position: fixed;
   top: 16px;
@@ -134,78 +157,70 @@ body {
   z-index: 20;
 }
 
-#snapshot-btn img {
-  width: 36px;
-  height: 36px;
-}
-
-/* Info button */
+/* ---------- Info button ---------- */
 #info-btn {
   position: fixed;
   top: 16px;
   right: 70px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   border: none;
-  background: #5E0F8B;
+  background: rgba(255,255,255,0.03);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
   z-index: 20;
 }
+#info-btn:hover { background: rgba(255,255,255,0.05); }
 
-/* Location Button */
+/* ---------- Location button (near camera) ---------- */
 #location-btn {
   position: fixed;
-  bottom: 10px;
-  left: 20px;
-  border-radius: 50%;
-  border: none;
+  top: 16px;
+  right: 120px;
   background: transparent;
+  border: none;
   z-index: 20;
 }
+#snapshot-btn img,
+#info-btn img,
 #location-btn img {
-  width: 42px;
-  height: 42px;
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
 }
 
-/* Info Modal */
+
+/* ---------- Info Modal ---------- */
 #info-modal {
   display: none;
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.95);
-  padding: 24px;
-  border-radius: 16px;
-  max-width: 90%;
-  width: 400px;
+  background: rgba(6,6,6,0.98);
+  padding: 22px;
+  border-radius: 14px;
+  max-width: 92%;
+  width: 420px;
   z-index: 9999;
+  border: 1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
 }
-
-#info-modal h3 {
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.info-content ul {
-  padding-left: 20px;
-  line-height: 1.6;
-}
-
+#info-modal h3 { margin-bottom: 10px; text-align: center; font-family: 'Playfair Display', serif; color: var(--accent); }
+.info-content ul { padding-left: 20px; line-height: 1.6; color: var(--muted); }
 .close-btn {
-  background-color: #5E0F8B;
-  color: #ffffff;
-  border: none;
+  background: var(--accent);
+  color: var(--accent-contrast);
   padding: 10px 15px;
   border-radius: 8px;
+  border: none;
   cursor: pointer;
-  margin-top: 20px;
+  margin-top: 16px;
 }
 
-/* Snapshot Modal */
+/* ---------- Snapshot Modal ---------- */
 #snapshot-modal {
   display: none;
   position: fixed;
@@ -213,140 +228,231 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   background: #fff;
+  color: #000;
   border-radius: 12px;
   padding: 20px;
   text-align: center;
+  max-width: 92%;
+  width: 460px;
   z-index: 9999;
-  max-width: 90%;
-  width: 420px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  border: 1px solid rgba(0,0,0,0.06);
 }
-
-#snapshot-preview {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
+#snapshot-preview { width: 100%; max-width: 420px; border-radius: 10px; margin-bottom: 12px; }
 .snapshot-buttons button {
-  margin: 5px;
+  margin: 6px;
   padding: 10px 16px;
-  border: none;
   border-radius: 8px;
-  background: #5E0F8B;
-  color: #ffffff;
+  border: none;
+  background: var(--accent);
+  color: var(--accent-contrast);
   cursor: pointer;
 }
 
-/* FLASH overlay */
+/* ---------- Flash Overlay ---------- */
 #flash-overlay {
   position: fixed;
   inset: 0;
   background: #fff;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 0.12s ease-out;
   z-index: 9998;
-  transition: opacity 0.15s ease-out;
 }
+#flash-overlay.active { opacity: 0.85; }
 
-#flash-overlay.active {
-  opacity: 0.9;
-}
-
-/* Gallery Modal */
+/* ===========================
+   FULLSCREEN GALLERY MODAL
+   ===========================*/
 #gallery-modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.86);
   z-index: 9999;
   justify-content: center;
   align-items: center;
 }
-
 .gallery-content {
-  background: #111;
+  background: linear-gradient(180deg,#0b0b0b,#070707);
   border-radius: 18px;
-  padding: 20px 20px 16px;
-  max-width: 90%;
-  width: 640px;
+  padding: 20px;
+  max-width: 95%;
+  width: 860px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.7);
   position: relative;
-}
-
-.gallery-content h2 {
-  text-align: center;
-  margin-bottom: 10px;
+  border: 1px solid rgba(255,255,255,0.03);
 }
 
 #gallery-close {
   position: absolute;
-  top: 10px;
-  right: 14px;
-  background: #5E0F8B;
-  color: #fff;
+  top: 12px;
+  right: 16px;
+  background: var(--accent);
+  color: var(--accent-contrast);
   border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   font-size: 20px;
   cursor: pointer;
 }
 
-#gallery-main {
-  width: 100%;
-  max-height: 320px;
-  object-fit: contain;
-  border-radius: 10px;
-  background: #000;
-  margin-bottom: 12px;
-}
-
-#gallery-thumbs {
+/* Layout: main image + side slider */
+#gallery-layout {
   display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 6px;
-  max-height: 150px;
-  overflow-y: auto;
-  justify-content:center;
-  margin-bottom: 10px;
 }
 
+/* Big main image */
+#gallery-main {
+  width: 78%;
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #000;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+}
+
+/* Side thumbnail slider */
+#gallery-side-slider {
+  width: 18%;
+  max-height: 82vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.02);
+}
+#gallery-side-slider::-webkit-scrollbar { width: 6px; }
+#gallery-side-slider::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,var(--accent),var(--accent-2));
+  border-radius: 4px;
+}
+
+/* thumbs container */
+#gallery-thumbs { display: flex; flex-direction: column; gap: 10px; }
 #gallery-thumbs img {
-  width: 70px;
-  height: 70px;
+  width: 100%;
+  height: 90px;
   object-fit: cover;
-  border-radius: 8px;
   cursor: pointer;
+  border-radius: 8px;
   border: 2px solid transparent;
 }
-
 #gallery-thumbs img.active {
-  border-color: #f4a600;
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px rgba(212,175,55,0.08);
 }
 
+/* Buttons under gallery */
 .gallery-buttons {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  margin-top: 12px;
+  gap: 12px;
 }
-
 .gallery-buttons button {
-  padding: 8px 14px;
+  padding: 10px 18px;
   border-radius: 999px;
   border: none;
-  background: #5E0F8B;
-  color: #fff;
+  background: rgba(255,255,255,0.03);
+  color: var(--muted);
   cursor: pointer;
-  font-size: 14px;
+}
+.gallery-buttons button:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
+/* ===========================
+   MOBILE LAYOUT
+   ===========================*/
+@media (max-width: 650px) {
+  #gallery-layout { flex-direction: column; }
+  #gallery-main { width: 100%; max-height: 70vh; }
+  #gallery-side-slider {
+    width: 100%;
+    max-height: 120px;
+    overflow-y: hidden;
+    overflow-x: auto;
+    padding: 10px 0;
+  }
+  #gallery-thumbs { flex-direction: row; gap: 10px; }
+  #gallery-thumbs img { width: 90px; height: 90px; }
 }
 
-/* Responsive tweaks */
-@media (max-width: 600px) {
-  #jewelry-options img {
-    height: 50px;
-  }
-  #jewelry-mode {
-    bottom: 120px;
-  }
+/* ===========================
+   LIVE TUNING PANEL (kept)
+   ===========================*/
+#tuning-panel {
+  position: fixed;
+  right: 14px;
+  top: 80px;
+  width: 270px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(6px);
+  padding: 12px;
+  border-radius: 12px;
+  z-index: 10000;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 13px;
 }
+#tuning-panel h4 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+.tune-row { margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+.tune-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.tune-value { background: rgba(0,0,0,0.45); padding: 2px 8px; border-radius: 99px; font-size: 12px; font-weight: 700; color: #fff; }
+.tune-row input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 99px;
+  outline: none;
+}
+.tune-row input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid rgba(0,0,0,0.25);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  cursor: pointer;
+}
+.toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.toggle {
+  --w:44px;
+  --h:24px;
+  width: var(--w);
+  height: var(--h);
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background .18s;
+}
+.toggle .knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(var(--h) - 4px);
+  height: calc(var(--h) - 4px);
+  background: #fff;
+  border-radius: 50%;
+  transition: left .18s, background .18s;
+}
+.toggle.on { background: linear-gradient(90deg,var(--accent),var(--accent-2)); }
+.toggle.on .knob { left: calc(var(--w) - var(--h) + 2px); background: #fff; }
+.tuning-help { font-size: 11px; color: rgba(255,255,255,0.72); margin-top: 6px; }
+#tuning-panel.hidden { display: none !important; }
+
+/* small helpers */
+.hidden { display: none !important; }
+
+/* end of file */
